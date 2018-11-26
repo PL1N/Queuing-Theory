@@ -6,7 +6,8 @@
 
 # Windows
 # thumbnails
-.idea/
+.idea/*
+*.iml
 Thumbs.db
 
 # Mac OS X
