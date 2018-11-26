@@ -22,7 +22,7 @@ public class Kronecker {
     public static int[][] createQ1(int [][] D0,int [][] S) {
         int [][] e1 = createEWithOutScanner(D0.length);
         int [][] e2 = createEWithOutScanner(S.length);
-        int [][] result = kroneckerSum(product(D0,e1) , product(e2,S));
+        int [][] result = kroneckerSum(kroneckerProduct(D0,e1) , kroneckerProduct(e2,S));
         return result;
     }
 
@@ -47,31 +47,29 @@ public class Kronecker {
 
     public static void infinitesimalGenerator(int [][] D0,int [][] D1, int [][]e,int [][] S,
     int W,int M , int [][] B) {
-        S0 = product2Matix(createNegativeMatrix(S),createEAsVector(S));
+        S0 = product2Matrix(createNegativeMatrix(S),createEAsVector(S));
         Q00 = D0;
         Q01 = D1;
-        Q10 = product(createEWithOutScanner(W + 1),S0);
-        int [][] S0B = product2Matix(S0,B);
-        Q0 = product(createEWithOutScanner(W + 1),S0B);
+        Q10 = kroneckerProduct(createEWithOutScanner(W + 1),S0);
+        int [][] S0B = product2Matrix(S0,B);
+        Q0 = kroneckerProduct(createEWithOutScanner(W + 1),S0B);
         Q1 = createQ1(D0,S);
-        Q2 = product(D1,createEWithOutScanner(M));
+        Q2 = kroneckerProduct(D1,createEWithOutScanner(M));
     }
 
-    public static int[][] product2Matix(int [][] a, int [][] b) {
-        int aColLength = a[0].length;
-        int bRowLength = b.length;
-        if(aColLength != bRowLength) return null;
-        int RRowLength = a.length;
-        int RColLength = b[0].length;
-        int[][] Result = new int[RRowLength][RColLength];
-        for(int i = 0; i < RRowLength; i++) {
-            for(int j = 0; j < RColLength; j++) {
-                for(int k = 0; k < aColLength; k++) {
-                    Result[i][j] += a[i][k] * b[k][j];
+    public static int[][] product2Matrix(int [][] a, int [][] b) {
+        if(a[0].length == b.length){
+            int[][] Result = new int[a.length][b[0].length];
+            for(int i = 0; i < a.length; i++) {
+                for(int j = 0; j < b[0].length; j++) {
+                    for(int k = 0; k < a.length; k++) {
+                        Result[i][j] += a[i][k] * b[k][j];
+                    }
                 }
             }
+            return Result;
         }
-        return Result;
+        return null;
     }
 
     public static int[][] createEWithOutScanner (int length) {
@@ -117,7 +115,19 @@ public class Kronecker {
             return sum;
     }
 
-    public static int[][] product(final int[][] a, final int[][] b) {
+    public static int [][] sum(int [][] a, int [][] b) {
+        if(a.length == b.length && a[0].length == b[0].length){
+            int[][] sum = new int[a.length][a[0].length];
+            for(int i = 0; i < a.length; ++i) {
+                for (int j = 0; j < a[0].length; ++j) {
+                    sum[i][j] = a[i][j] + b[i][j];
+                }
+            }
+        }
+        return null;
+    }
+
+    public static int[][] kroneckerProduct(final int[][] a, final int[][] b) {
         final int[][] c = new int[a.length*b.length][];
         for (int ix = 0; ix < c.length; ix++) {
             final int num_cols = a[0].length*b[0].length;
@@ -171,7 +181,7 @@ public class Kronecker {
         System.out.println("Matrix b:");
         print_matrix(b);
         System.out.println("Calculating matrix c as Kronecker product");
-        final int[][] c = product(a, b);
+        final int[][] c = kroneckerProduct(a, b);
         System.out.println("Size of matrix c: " + c.length + " by " + c[0].length);
         System.out.println("Matrix c:");
         print_matrix(c);
@@ -198,7 +208,7 @@ public class Kronecker {
     }
 
     public static void main(final String[] args) {
-        Scanner in = new Scanner(System.in);
+        /*Scanner in = new Scanner(System.in);
         System.out.println("Введите матрицу D0 :");
         int [][] D0 = Kronecker.readMAtrix(in);
         System.out.println("Введите матрицу D1 :");
@@ -219,10 +229,19 @@ public class Kronecker {
         print_matrix(D1);
         System.out.println();
         print_matrix(e);
-        System.out.println();
+        System.out.println();*/
+
+
 
 
 
     }
 
 }
+
+
+/*
+* int[][]A = {{1,0},{0,1}};
+        int[][]B = {{1},{1}};
+
+        Kronecker.print_matrix(Kronecker.product2Matrix(A, B));*/
