@@ -17,12 +17,14 @@ public class Kronecker {
      static double[][] Q2;
 
     public static double[][] readMAtrix(Scanner in) {
-        System.out.println("Введите размер матрицы : ");
+        System.out.println("Введите размер квадртаной матрицы : ");
         int n = in.nextInt();
         double [][] arr = new double[n][n];
-        for (int i = 0; i < n; ++i)
-            for(int j = 0; j < n; ++j)
+        for (int i = 0; i < n; ++i) {
+            System.out.println("Ввелдие элементы " + (i + 1) + " строки");
+            for (int j = 0; j < n; ++j)
                 arr[i][j] = in.nextDouble();
+        }
         return arr;
     }
 
@@ -31,6 +33,7 @@ public class Kronecker {
     	int n = in.nextInt();
         double [] arr = new double [n];
     	for (int i = 0; i < arr.length ; ++i) {
+            System.out.println("Введите " + (i + 1) + " элемент");
     		arr[i] = in.nextDouble();
     	}
     	return arr;
@@ -70,6 +73,29 @@ public class Kronecker {
         Q2 = kroneckerProduct(D1,createE(M));
     }
 
+    public static void print_generator() {
+        System.out.println("SO");
+        print_vector(S0);
+        System.out.println();
+        System.out.println("Q00");
+        print_matrix(Q00);
+        System.out.println();
+        System.out.println("Q01");
+        print_matrix(Q01);
+        System.out.println();
+        System.out.println("Q10");
+        print_matrix(Q10);
+        System.out.println();
+        System.out.println("Q0");
+        print_matrix(Q0);
+        System.out.println();
+        System.out.println("Q1");
+        print_matrix(Q1);
+        System.out.println();
+        System.out.println("Q2");
+        print_matrix(Q2);
+        System.out.println();
+    }
     public static double[] product2Vectors(double [] a, double [] b) {
         double [] result = new double[a.length];
         for (int i = 0 ; i < a.length ; ++i) {
@@ -97,7 +123,7 @@ public class Kronecker {
         double [] resultVector = new double[matrix[0].length];
         for (int j = 0; j < matrix[0].length; j++) {
             for (int i = 0; i < matrix.length; i++) {
-                resultVector[j] += matrix[i][j] * vector[i];
+                resultVector[j] += matrix[j][i] * vector[i];
             }
         }
         return resultVector;
@@ -134,15 +160,16 @@ public class Kronecker {
     }
 
     public static double [][] sum(double [][] a, double [][] b) {
+        double[][] sum = {};
         if(a.length == b.length && a[0].length == b[0].length){
-            double[][] sum = new double[a.length][a[0].length];
+            sum = new double[a.length][a[0].length];
             for(int i = 0; i < a.length; ++i) {
                 for (int j = 0; j < a[0].length; ++j) {
                     sum[i][j] = a[i][j] + b[i][j];
                 }
             }
         }
-        return null;
+        return sum;
     }
 
     public static double[][] kroneckerProductOfMatrixAndVector(double[][] a, double[] b) {
@@ -185,8 +212,8 @@ public class Kronecker {
         return c;
     }
 
-    public static void print_matrix(final double[][] m) {
-        final String[][] sts = new String[m.length][];
+    public static void print_matrix(double[][] m) {
+        String[][] sts = new String[m.length][];
         int max_length = 0;
         for (int im = 0; im < m.length; im++) {
             sts[im] = new String[m[im].length];
@@ -209,6 +236,14 @@ public class Kronecker {
             System.out.format(format, m[im][m[im].length - 1]);
             System.out.println("|");
         }
+    }
+
+    public static void print_vector(double [] m) {
+        System.out.print("| ");
+        for (int i = 0 ; i < m.length  ; ++i) {
+            System.out.print(m[i] + " ");
+        }
+        System.out.print(" |");
     }
 
     private static double[][] testKronekerProduct(final double[][] a, final double[][] b) {
@@ -254,6 +289,8 @@ public class Kronecker {
         System.out.println("Введите число M :");
         int M = in.nextInt();
         Kronecker.infinitesimalGenerator(W,M);
+        Kronecker.print_generator();
+
     }
 
 }
