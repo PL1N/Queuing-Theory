@@ -2,21 +2,38 @@ import java.util.Scanner;
 
 public class Kronecker {
 
-    private static double[][] S0;
-    private static double[][] Q00;
-    private static double[][] Q01;
-    private static double[][] Q10;
-    private static double[][] Q0;
-    private static double[][] Q1;
-    private static double[][] Q2;
 
-    public static int[][] readMAtrix(Scanner in) {
+     static double[][] D0;
+     static double[][] D1;
+     static double[][] S;
+     static double[] B;
+     static double[][] e;
+     static double[] S0;
+     static double[][] Q00;
+     static double[][] Q01;
+     static double[][] Q10;
+     static double[][] Q0;
+     static double[][] Q1;
+     static double[][] Q2;
+
+    public static double[][] readMAtrix(Scanner in) {
+        System.out.println("Введите размер матрицы : ");
         int n = in.nextInt();
-        int [][] arr = new int[n][n];
+        double [][] arr = new double[n][n];
         for (int i = 0; i < n; ++i)
             for(int j = 0; j < n; ++j)
-                arr[i][j] = in.nextInt();
+                arr[i][j] = in.nextDouble();
         return arr;
+    }
+
+    public static double [] readVector(Scanner in) {
+        System.out.println("Введите кол-во элементов вектора : ");
+    	int n = in.nextInt();
+        double [] arr = new double [n];
+    	for (int i = 0; i < arr.length ; ++i) {
+    		arr[i] = in.nextDouble();
+    	}
+    	return arr;
     }
 
     public static double[][] kronekerSum(double [][] D0,double [][] S) {
@@ -34,24 +51,31 @@ public class Kronecker {
         return matrix;
     }
 
-    public static double[][] createEAsVector(int length) {
-        double [][] result = new double[1][length];
+    public static double[] createEAsVector(int length) {
+        double [] result = new double[length];
         for (int i = 0 ; i < result.length; ++i) {
-            result[0][i] = 1;
+            result[i] = 1;
         }
         return result;
     }
 
-    public static void infinitesimalGenerator(double [][] D0,double [][] D1, double [][]e,double [][] S,
-                                              int W,int M , double [][] B) {
-        S0 = product2Matrix(createNegativeMatrix(S, -1),createEAsVector(S.length));
+    public static void infinitesimalGenerator(int W,int M ) {
+        S0 = productMatrixAndVector(createNegativeMatrix(S, -1),createEAsVector(S.length));
         Q00 = D0;
         Q01 = D1;
-        Q10 = kroneckerProduct(createE(W + 1),S0);
-        double [][] S0B = product2Matrix(S0,B);
-        Q0 = kroneckerProduct(createE(W + 1),S0B);
+        Q10 = kroneckerProductOfMatrixAndVector(createE(W + 1),S0);
+        double [] S0B = product2Vectors(S0,B);
+        Q0 = kroneckerProductOfMatrixAndVector(createE(W + 1),S0B);
         Q1 = kronekerSum(D0,S);
         Q2 = kroneckerProduct(D1,createE(M));
+    }
+
+    public static double[] product2Vectors(double [] a, double [] b) {
+        double [] result = new double[a.length];
+        for (int i = 0 ; i < a.length ; ++i) {
+            result[i] = a[i] * b[i];
+        }
+        return result;
     }
 
     public static double[][] product2Matrix(double [][] a, double [][] b) {
@@ -67,6 +91,16 @@ public class Kronecker {
             return Result;
         }
         return null;
+    }
+
+    public static double [] productMatrixAndVector(double [][] matrix , double [] vector) {
+        double [] resultVector = new double[matrix[0].length];
+        for (int j = 0; j < matrix[0].length; j++) {
+            for (int i = 0; i < matrix.length; i++) {
+                resultVector[j] += matrix[i][j] * vector[i];
+            }
+        }
+        return resultVector;
     }
 
     public static double[][] createE (int length) {
@@ -111,10 +145,32 @@ public class Kronecker {
         return null;
     }
 
-    public static double[][] kroneckerProduct(final double[][] a, final double[][] b) {
-        final double[][] c = new double[a.length*b.length][];
+    public static double[][] kroneckerProductOfMatrixAndVector(double[][] a, double[] b) {
+        double [][] b1 = new double[1][b.length];
+        for(int i = 0 ; i < b1[0].length ; ++i) {
+            b1[0][i] = b[i];
+        }
+        final double[][] c = new double[a.length*b1.length][];
         for (int ix = 0; ix < c.length; ix++) {
-            final int num_cols = a[0].length*b[0].length;
+            final int num_cols = a[0].length*b1[0].length;
+            c[ix] = new double[num_cols];
+        }
+        for (int ia = 0; ia < a.length; ia++) {
+            for (int ja = 0; ja < a[ia].length; ja++) {
+                for (int ib = 0; ib < b1.length; ib++) {
+                    for (int jb = 0; jb < b1[ib].length; jb++) {
+                        c[b1.length*ia+ib][b1[ib].length*ja+jb] = a[ia][ja] * b1[ib][jb];
+                    }
+                }
+            }
+        }
+        return c;
+    }
+
+    public static double[][] kroneckerProduct(double[][] a, double[][] b) {
+        double[][] c = new double[a.length*b.length][];
+        for (int ix = 0; ix < c.length; ix++) {
+            int num_cols = a[0].length*b[0].length;
             c[ix] = new double[num_cols];
         }
         for (int ia = 0; ia < a.length; ia++) {
@@ -182,28 +238,22 @@ public class Kronecker {
     }
 
     public static void main(final String[] args) {
-        /*Scanner in = new Scanner(System.in);
+        Scanner in = new Scanner(System.in);
         System.out.println("Введите матрицу D0 :");
-        int [][] D0 = Kronecker.readMAtrix(in);
+        D0 = Kronecker.readMAtrix(in);
         System.out.println("Введите матрицу D1 :");
-        int [][] D1 = Kronecker.readMAtrix(in);
+        D1 = Kronecker.readMAtrix(in);
         System.out.println("Введите матрицу S :");
-        int [][] S = Kronecker.readMAtrix(in);
-        System.out.println("Введите матрицу B :");
-        int [][] B = Kronecker.readMAtrix(in);
+        S = Kronecker.readMAtrix(in);
+        System.out.println("Введите вектор B :");
+        B = Kronecker.readVector(in);
         System.out.println("Введите размерность матрицы I :");
-        int [][] e = Kronecker.createE(in);
+        e = Kronecker.createEWithScanner(in);
         System.out.println("Введите число W :");
         int W = in.nextInt();
         System.out.println("Введите число M :");
         int M = in.nextInt();
-        Kronecker.infinitesimalGenerator(D0,D1,e,S,W,M,B);
-        print_matrix(D0);
-        System.out.println();
-        print_matrix(D1);
-        System.out.println();
-        print_matrix(e);
-        System.out.println();*/
+        Kronecker.infinitesimalGenerator(W,M);
     }
 
 }
