@@ -315,24 +315,51 @@ public class Kronecker {
         return lambda;
     }
 
-    public double[] calcP0(double[] F) {
-        for (int i = 0; i < F.length; i++) {
-            Q00[i][0] = F[i];
+    private double[] sumV(double[] a, double[] b) {
+        double[] res = new double[a.length];
+        for (int i = 0; i < a.length; i++) {
+            res[i] = a[i] + b[i];
+        }
+        return res;
+    }
+
+    public double[] calcP0(Matrix[] F) {
+        double[][] matrix;
+        double[] vector = new double[F[0].getLength()];
+        double[] res = new double[F[0].getLength()];
+        for (int k = 0; k < F.length; k++) {
+            matrix = F[k].getMatrixArray();
+            for (int i = 0; i < matrix.length; i++) {
+                for (int j = 0; j < matrix[i].length; j++) {
+                    vector[j] += matrix[i][j];
+                }
+            }
+            res = sumV(vector, res);
         }
         double[] f = new double[Q00.length];
         Arrays.fill(f, 0);
         f[0] = 1;
-        double[] p0 = GaussMethod.calculateSolutions(Q00, f, f.length);
-        return p0;
+        for (int i = 0; i < F.length; i++) {
+            Q00[i][0] = res[i];
+        }
+        Q00 = createNegativeMatrix(Q00, -1);
+        return GaussMethod.calculateSolutions(Q00, f, f.length);
     }
 
-    public double[] calcP(double[] F) {
-        double[] p = new double[F.length];
+    public double[][] calcP(Matrix[] F) {
+        double[][] matrix;
+        double[][] p = new double[F.length][F.length];
         double[] p0 = this.calcP0(F);
-        for (int i = 0; i < F.length; i++) {
-            p[i] = p0[i] * F[i];
+        for (int k = 0; k < F.length; k++) {
+            matrix = F[k].getMatrixArray();
+            for (int i = 0; i < matrix.length; i++) {
+                for (int j = 0; j < matrix[i].length; j++) {
+                
+                }
+            }
+
         }
-        return p;
+       return p;
     }
 
     public static void main(final String[] args) {
@@ -383,5 +410,37 @@ class GaussMethod {
             }
         }
         return x;
+    }
+}
+
+class Matrix {
+    private String filePath;
+    private int rowsCount;
+    private int colsCount;
+    private double matrixArray[][];
+    private Scanner scanner;
+    private double inverse[][];
+
+    public Matrix(int n) {
+        rowsCount = n;
+        colsCount = n;
+        matrixArray = new double[n][n];
+        inverse = new double[n][n];
+    }
+
+    public void setMatrixArray(int i, int j, double num) {
+        this.matrixArray[i][j] = num;
+    }
+
+    public void setMatrixInverse(double[][] inverse) {
+        this.inverse = inverse;
+    }
+
+    public int getLength() {
+        return rowsCount;
+    }
+
+    public double[][] getMatrixArray() {
+        return this.matrixArray;
     }
 }
