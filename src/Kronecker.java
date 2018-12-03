@@ -2,12 +2,12 @@ import java.util.Scanner;
 
 public class Kronecker {
 
-
      static double[][] D0;
      static double[][] D1;
      static double[][] S;
      static double[] B;
      static double[][] e;
+
      static double[] S0;
      static double[][] Q00;
      static double[][] Q01;
@@ -15,8 +15,12 @@ public class Kronecker {
      static double[][] Q0;
      static double[][] Q1;
      static double[][] Q2;
+     static double[] teta;
+     static double [] mu;
+     static double [] lambda;
 
-    public static double[][] readMAtrix(Scanner in) {
+
+    public static double[][] readMatrix(Scanner in) {
         System.out.println("Введите размер квадртаной матрицы : ");
         int n = in.nextInt();
         double [][] arr = new double[n][n];
@@ -46,6 +50,62 @@ public class Kronecker {
         return result;
     }
 
+    public static double [][] inversionMatrix(double [][] matrix) {
+        double temp;
+
+        double [][] E = new double [matrix.length][matrix[0].length];
+
+
+        for (int i = 0; i < matrix.length; i++)
+            for (int j = 0; j < matrix[0].length; j++)
+            {
+                E[i][j] = 0f;
+
+                if (i == j)
+                    E[i][j] = 1f;
+            }
+
+        for (int k = 0; k < matrix.length; k++)
+        {
+            temp = matrix[k][k];
+
+            for (int j = 0; j < matrix[0].length; j++)
+            {
+                matrix[k][j] /= temp;
+                E[k][j] /= temp;
+            }
+
+            for (int i = k + 1; i < matrix.length; i++)
+            {
+                temp = matrix[i][k];
+
+                for (int j = 0; j < matrix.length; j++)
+                {
+                    matrix[i][j] -= matrix[k][j] * temp;
+                    E[i][j] -= E[k][j] * temp;
+                }
+            }
+        }
+
+        for (int k = matrix[0].length - 1; k > 0; k--)
+        {
+            for (int i = k - 1; i >= 0; i--)
+            {
+                temp = matrix[i][k];
+
+                for (int j = 0; j < matrix[0].length ; j++)
+                {
+                    matrix[i][j] -= matrix[k][j] * temp;
+                    E[i][j] -= E[k][j] * temp;
+                }
+            }
+        }
+
+        for (int i = 0; i < matrix.length; i++)
+            for (int j = 0; j < matrix[0].length; j++)
+                matrix[i][j] = E[i][j];
+        return matrix;
+    }
 
     public static double[][] createNegativeMatrix (double [][] matrix, double c) {
         for (int i = 0; i < matrix.length; ++i)
@@ -96,10 +156,12 @@ public class Kronecker {
         print_matrix(Q2);
         System.out.println();
     }
+
     public static double[] product2Vectors(double [] a, double [] b) {
         double [] result = new double[a.length];
         for (int i = 0 ; i < a.length ; ++i) {
-            result[i] = a[i] * b[i];
+            for(int j = 0; j < b.length ; ++j)
+                result[i] = a[i] * b[j];
         }
         return result;
     }
@@ -246,6 +308,32 @@ public class Kronecker {
         System.out.print(" |");
     }
 
+
+    public static void main(final String[] args) {
+        Scanner in = new Scanner(System.in);
+        System.out.println("Введите матрицу D0 :");
+        D0 = Kronecker.readMatrix(in);
+        System.out.println("Введите матрицу D1 :");
+        D1 = Kronecker.readMatrix(in);
+        System.out.println("Введите матрицу S :");
+        S = Kronecker.readMatrix(in);
+        System.out.println("Введите вектор B :");
+        B = Kronecker.readVector(in);
+        System.out.println("Введите размерность матрицы I :");
+        e = Kronecker.createEWithScanner(in);
+        System.out.println("Введите число W :");
+        int W = in.nextInt();
+        System.out.println("Введите число M :");
+        int M = in.nextInt();
+        Kronecker.infinitesimalGenerator(W,M);
+        Kronecker.print_generator();
+
+    }
+
+}
+
+/*
+
     private static double[][] testKronekerProduct(final double[][] a, final double[][] b) {
         System.out.println("Testing Kronecker product");
         System.out.println("Size of matrix a: " + a.length + " by " + a[0].length);
@@ -271,26 +359,4 @@ public class Kronecker {
         b[1] = new double[]{6, 7};
         testKronekerProduct(a, b);
     }
-
-    public static void main(final String[] args) {
-        Scanner in = new Scanner(System.in);
-        System.out.println("Введите матрицу D0 :");
-        D0 = Kronecker.readMAtrix(in);
-        System.out.println("Введите матрицу D1 :");
-        D1 = Kronecker.readMAtrix(in);
-        System.out.println("Введите матрицу S :");
-        S = Kronecker.readMAtrix(in);
-        System.out.println("Введите вектор B :");
-        B = Kronecker.readVector(in);
-        System.out.println("Введите размерность матрицы I :");
-        e = Kronecker.createEWithScanner(in);
-        System.out.println("Введите число W :");
-        int W = in.nextInt();
-        System.out.println("Введите число M :");
-        int M = in.nextInt();
-        Kronecker.infinitesimalGenerator(W,M);
-        Kronecker.print_generator();
-
-    }
-
-}
+* */
