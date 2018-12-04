@@ -347,19 +347,13 @@ public class Kronecker {
     }
 
     public double[][] calcP(Matrix[] F) {
-        double[][] matrix;
+        double[][] matrix = new double[F.length][F[0].getLength()];
         double[][] p = new double[F.length][F.length];
         double[] p0 = this.calcP0(F);
         for (int k = 0; k < F.length; k++) {
-            matrix = F[k].getMatrixArray();
-            for (int i = 0; i < matrix.length; i++) {
-                for (int j = 0; j < matrix[i].length; j++) {
-                
-                }
-            }
-
+            matrix[k] = prodVM(p0, F[k].getMatrixArray());
         }
-       return p;
+        return matrix;
     }
 
     public static void main(final String[] args) {
