@@ -15,7 +15,8 @@ public class Kronecker {
     static double[][] Q1;
     static double[][] Q2;
 
-    public static double[][] readMAtrix(Scanner in) {
+
+    public static double[][] readMatrix(Scanner in) {
         System.out.println("Введите размер квадртаной матрицы : ");
         int n = in.nextInt();
         double[][] arr = new double[n][n];
@@ -45,6 +46,62 @@ public class Kronecker {
         return result;
     }
 
+    public static double [][] inversionMatrix(double [][] matrix) {
+        double temp;
+
+        double [][] E = new double [matrix.length][matrix[0].length];
+
+
+        for (int i = 0; i < matrix.length; i++)
+            for (int j = 0; j < matrix[0].length; j++)
+            {
+                E[i][j] = 0f;
+
+                if (i == j)
+                    E[i][j] = 1f;
+            }
+
+        for (int k = 0; k < matrix.length; k++)
+        {
+            temp = matrix[k][k];
+
+            for (int j = 0; j < matrix[0].length; j++)
+            {
+                matrix[k][j] /= temp;
+                E[k][j] /= temp;
+            }
+
+            for (int i = k + 1; i < matrix.length; i++)
+            {
+                temp = matrix[i][k];
+
+                for (int j = 0; j < matrix.length; j++)
+                {
+                    matrix[i][j] -= matrix[k][j] * temp;
+                    E[i][j] -= E[k][j] * temp;
+                }
+            }
+        }
+
+        for (int k = matrix[0].length - 1; k > 0; k--)
+        {
+            for (int i = k - 1; i >= 0; i--)
+            {
+                temp = matrix[i][k];
+
+                for (int j = 0; j < matrix[0].length ; j++)
+                {
+                    matrix[i][j] -= matrix[k][j] * temp;
+                    E[i][j] -= E[k][j] * temp;
+                }
+            }
+        }
+
+        for (int i = 0; i < matrix.length; i++)
+            for (int j = 0; j < matrix[0].length; j++)
+                matrix[i][j] = E[i][j];
+        return matrix;
+    }
 
     public static double[][] createNegativeMatrix(double[][] matrix, double c) {
         for (int i = 0; i < matrix.length; ++i)
@@ -96,10 +153,11 @@ public class Kronecker {
         System.out.println();
     }
 
-    public static double[] product2Vectors(double[] a, double[] b) {
-        double[] result = new double[a.length];
-        for (int i = 0; i < a.length; ++i) {
-            result[i] = a[i] * b[i];
+    public static double[] product2Vectors(double [] a, double [] b) {
+        double [] result = new double[a.length];
+        for (int i = 0 ; i < a.length ; ++i) {
+            for(int j = 0; j < b.length ; ++j)
+                result[i] = a[i] * b[j];
         }
         return result;
     }
