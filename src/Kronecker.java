@@ -350,7 +350,7 @@ public class Kronecker {
         for (int i = 0; i < res.length; i++) {
             lambda += res[i];
         }
-        if (lambda / mu > 1) {
+        if (lambda / mu >= 1) {
             throw new Exception();
         }
         return lambda;
@@ -370,6 +370,7 @@ public class Kronecker {
         double[] res = new double[F[0].getLength()];
         for (int k = 0; k < F.length; k++) {
             matrix = F[k].getMatrixArray();
+            Arrays.fill(vector, 0);
             for (int i = 0; i < matrix.length; i++) {
                 for (int j = 0; j < matrix[i].length; j++) {
                     vector[j] += matrix[i][j];
@@ -389,7 +390,6 @@ public class Kronecker {
 
     public double[][] calcP(Matrix[] F) {
         double[][] matrix = new double[F.length][F[0].getLength()];
-        double[][] p = new double[F.length][F.length];
         double[] p0 = this.calcP0(F);
         for (int k = 0; k < F.length; k++) {
             matrix[k] = prodVM(p0, F[k].getMatrixArray());
