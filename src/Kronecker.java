@@ -46,57 +46,39 @@ public class Kronecker {
         return result;
     }
 
-    public static double [][] inversionMatrix(double [][] matrix) {
+    public static double[][] inversionMatrix(double[][] matrix) {
         double temp;
-
-        double [][] E = new double [matrix.length][matrix[0].length];
-
-
+        double[][] E = new double[matrix.length][matrix[0].length];
         for (int i = 0; i < matrix.length; i++)
-            for (int j = 0; j < matrix[0].length; j++)
-            {
+            for (int j = 0; j < matrix[0].length; j++) {
                 E[i][j] = 0f;
-
                 if (i == j)
                     E[i][j] = 1f;
             }
-
-        for (int k = 0; k < matrix.length; k++)
-        {
+        for (int k = 0; k < matrix.length; k++) {
             temp = matrix[k][k];
-
-            for (int j = 0; j < matrix[0].length; j++)
-            {
+            for (int j = 0; j < matrix[0].length; j++) {
                 matrix[k][j] /= temp;
                 E[k][j] /= temp;
             }
-
-            for (int i = k + 1; i < matrix.length; i++)
-            {
+            for (int i = k + 1; i < matrix.length; i++) {
                 temp = matrix[i][k];
-
-                for (int j = 0; j < matrix.length; j++)
-                {
+                for (int j = 0; j < matrix.length; j++) {
                     matrix[i][j] -= matrix[k][j] * temp;
                     E[i][j] -= E[k][j] * temp;
                 }
             }
         }
-
-        for (int k = matrix[0].length - 1; k > 0; k--)
-        {
-            for (int i = k - 1; i >= 0; i--)
-            {
+        for (int k = matrix[0].length - 1; k > 0; k--) {
+            for (int i = k - 1; i >= 0; i--) {
                 temp = matrix[i][k];
 
-                for (int j = 0; j < matrix[0].length ; j++)
-                {
+                for (int j = 0; j < matrix[0].length; j++) {
                     matrix[i][j] -= matrix[k][j] * temp;
                     E[i][j] -= E[k][j] * temp;
                 }
             }
         }
-
         for (int i = 0; i < matrix.length; i++)
             for (int j = 0; j < matrix[0].length; j++)
                 matrix[i][j] = E[i][j];
@@ -153,10 +135,10 @@ public class Kronecker {
         System.out.println();
     }
 
-    public static double[] product2Vectors(double [] a, double [] b) {
-        double [] result = new double[a.length];
-        for (int i = 0 ; i < a.length ; ++i) {
-            for(int j = 0; j < b.length ; ++j)
+    public static double[] product2Vectors(double[] a, double[] b) {
+        double[] result = new double[a.length];
+        for (int i = 0; i < a.length; ++i) {
+            for (int j = 0; j < b.length; ++j)
                 result[i] = a[i] * b[j];
         }
         return result;
@@ -346,6 +328,7 @@ public class Kronecker {
 
     public double calcLambda() throws Exception {
         int sum = 0;
+        double[][] Smin1 = inversionMatrix(S);
         double[] res = prodVM(b, Smin1);
         double mu;
         mu = 0;
@@ -417,11 +400,11 @@ public class Kronecker {
     public static void main(final String[] args) {
         Scanner in = new Scanner(System.in);
         System.out.println("Введите матрицу D0 :");
-        D0 = Kronecker.readMAtrix(in);
+        D0 = Kronecker.readMatrix(in);
         System.out.println("Введите матрицу D1 :");
-        D1 = Kronecker.readMAtrix(in);
+        D1 = Kronecker.readMatrix(in);
         System.out.println("Введите матрицу S :");
-        S = Kronecker.readMAtrix(in);
+        S = Kronecker.readMatrix(in);
         System.out.println("Введите вектор b :");
         b = Kronecker.readVector(in);
         System.out.println("Введите размерность матрицы I :");
