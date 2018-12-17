@@ -4,18 +4,18 @@ import java.util.Arrays;
 import java.util.Scanner;
 
 public class Kronecker {
-    static double[][] D0;
-    static double[][] D1;
-    static double[][] S;
+    static Matrix D0;
+    static Matrix D1;
+    static Matrix S;
     static double[] b;
-    static double[][] e;
+    static Matrix e;
     static double[] S0;
-    static double[][] Q00;
-    static double[][] Q01;
-    static double[][] Q10;
-    static double[][] Q0;
-    static double[][] Q1;
-    static double[][] Q2;
+    static Matrix Q00;
+    static Matrix Q01;
+    static Matrix Q10;
+    static Matrix Q0;
+    static Matrix Q1;
+    static Matrix Q2;
 
 
     public static double[][] readMatrix(Scanner in) {
@@ -103,14 +103,14 @@ public class Kronecker {
     }
 
     public static void infinitesimalGenerator(int W, int M) {
-        S0 = productMatrixAndVector(createNegativeMatrix(S, -1), createEAsVector(S.length));
+        S0 = productMatrixAndVector(createNegativeMatrix(S.getMatrixArray(), -1), createEAsVector(S.getLength()));
         Q00 = D0;
         Q01 = D1;
-        Q10 = kroneckerProductOfMatrixAndVector(createE(W + 1), S0);
+        Q10 = new Matrix(kroneckerProductOfMatrixAndVector(createE(W + 1), S0));
         double[] S0B = product2Vectors(S0, b);
-        Q0 = kroneckerProductOfMatrixAndVector(createE(W + 1), S0B);
-        Q1 = kronekerSum(D0, S);
-        Q2 = kroneckerProduct(D1, createE(M));
+        Q0 = new Matrix(kroneckerProductOfMatrixAndVector(createE(W + 1), S0B));
+        Q1 = new Matrix(kronekerSum(D0.getMatrixArray(), S.getMatrixArray()));
+        Q2 = new Matrix(kroneckerProduct(D1.getMatrixArray(), createE(M)));
     }
 
     public static void print_generator() {
@@ -118,22 +118,22 @@ public class Kronecker {
         print_vector(S0);
         System.out.println();
         System.out.println("Q00");
-        print_matrix(Q00);
+        print_matrix(Q00.getMatrixArray());
         System.out.println();
         System.out.println("Q01");
-        print_matrix(Q01);
+        print_matrix(Q01.getMatrixArray());
         System.out.println();
         System.out.println("Q10");
-        print_matrix(Q10);
+        print_matrix(Q10.getMatrixArray());
         System.out.println();
         System.out.println("Q0");
-        print_matrix(Q0);
+        print_matrix(Q0.getMatrixArray());
         System.out.println();
         System.out.println("Q1");
-        print_matrix(Q1);
+        print_matrix(Q1.getMatrixArray());
         System.out.println();
         System.out.println("Q2");
-        print_matrix(Q2);
+        print_matrix(Q2.getMatrixArray());
         System.out.println();
     }
 
@@ -328,9 +328,9 @@ public class Kronecker {
         return res;
     }
 
-    public static double calcLambda(){
+    public static double calcLambda() {
         int sum = 0;
-        double[][] Smin1 = inversionMatrix(S);
+        double[][] Smin1 = inversionMatrix(S.getMatrixArray());
         double[] res = prodVM(b, Smin1);
         double mu;
         mu = 0;
@@ -339,7 +339,7 @@ public class Kronecker {
         }
         mu *= (-1);
         mu /= mu;
-        double[][] matrix = sum(D0, D1);
+        double[][] matrix = sum(D0.getMatrixArray(), D1.getMatrixArray());
         for (int i = 0; i < matrix.length; i++) {
             matrix[i][0] = 1;
         }
@@ -349,13 +349,13 @@ public class Kronecker {
         matrix = Kronecker.transposeMatrix(matrix);
         double[] tetta = GaussMethod.calculateSolutions(matrix, f, f.length);
         double lambda = 0;
-        res = prodVM(tetta, D1);
+        res = prodVM(tetta, D1.getMatrixArray());
         for (int i = 0; i < res.length; i++) {
             lambda += res[i];
         }
         System.out.println("mu = " + mu);
         if (lambda / mu >= 1) {
-            System.out.println("Анин метод");;
+            System.out.println("Условие не выполняется");
         }
         return lambda;
     }
@@ -382,14 +382,14 @@ public class Kronecker {
             }
             res = sumV(vector, res);
         }
-        double[] f = new double[Q00.length];
+        double[] f = new double[Q00.getLength()];
         Arrays.fill(f, 0);
         f[0] = 1;
         for (int i = 0; i < F.length; i++) {
-            Q00[i][0] = res[i];
+            Q00.matrixArray[i][0] = res[i];
         }
-        Q00 = createNegativeMatrix(Q00, -1);
-        return GaussMethod.calculateSolutions(Q00, f, f.length);
+        Q00 = new Matrix(createNegativeMatrix(Q00.getMatrixArray(), -1));
+        return GaussMethod.calculateSolutions(Q00.getMatrixArray(), f, f.length);
     }
 
     public double[][] calcP(Matrix[] F) {
@@ -412,44 +412,60 @@ public class Kronecker {
         return transpose;
     }
 
+    public static double[] getVectorFromFile(String filePath) throws FileNotFoundException {
+        Scanner scanner = new Scanner(new File(filePath));
+        int n = scanner.nextInt();
+        double[] mas = new double[n];
+        for (int i = 0; i < n; i++) {
+            mas[i] = scanner.nextDouble();
+        }
+        scanner.close();
+        return mas;
+    }
+
     public static void main(final String[] args) {
         try {
-//            Scanner in = new Scanner(System.in);
-//            System.out.println("Введите матрицу D.txt :");
-//            D.txt = Kronecker.readMatrix(in);
-//            System.out.println("Введите матрицу D1 :");
-//            D1 = Kronecker.readMatrix(in);
-//            System.out.println("Введите матрицу S :");
-//            S = Kronecker.readMatrix(in);
-//            System.out.println("Введите вектор b :");
-//            b = Kronecker.readVector(in);
-//            System.out.println("Введите размерность матрицы I :");
-//            e = Kronecker.createEWithScanner(in);
-//            System.out.println("Введите число W :");
-//            int W = in.nextInt();
-//            System.out.println("Введите число M :");
-//            int M = in.nextInt();
-//            Kronecker.infinitesimalGenerator(W, M);
-//            Kronecker.print_generator();
+           /* Scanner in = new Scanner(System.in);
+            System.out.println("Введите матрицу D.txt :");
+            D.txt = Kronecker.readMatrix(in);
+            System.out.println("Введите матрицу D1 :");
+            D1 = Kronecker.readMatrix(in);
+            System.out.println("Введите матрицу S :");
+            S = Kronecker.readMatrix(in);
+            System.out.println("Введите вектор b :");
+            b = Kronecker.readVector(in);
+            System.out.println("Введите размерность матрицы I :");
+            e = Kronecker.createEWithScanner(in);
+            System.out.println("Введите число W :");
+            int W = in.nextInt();
+            System.out.println("Введите число M :");
+            int M = in.nextInt();
+            Kronecker.infinitesimalGenerator(W, M);
+            Kronecker.print_generator();*/
 
 
-            Matrix D0 = new Matrix("inputData/D.txt");
+            Kronecker.D0 = new Matrix("inputData/D.txt");
             D0.getMatrixFromFile();
             System.out.println("D.txt:");
             D0.printMatrix();
 
-            Matrix S = new Matrix("inputData/S.txt");
+            Kronecker.S = new Matrix("inputData/S.txt");
             S.getMatrixFromFile();
             System.out.println("S.txt:");
             S.printMatrix();
 
-            Kronecker.S = S.getMatrixArray();
+            Kronecker.S = S;
 
-
-            Matrix D1 = new Matrix("inputData/D1.txt");
+            Kronecker.D1 = new Matrix("inputData/D1.txt");
             D1.getMatrixFromFile();
             System.out.println("D1.txt:");
             D1.printMatrix();
+
+            Kronecker.b = Kronecker.getVectorFromFile("inputData/b.txt");
+            System.out.println("b:");
+            for (int i = 0; i < Kronecker.b.length; i++) {
+                System.out.print(b[i]+" ");
+            }
 
             double l = Kronecker.calcLambda();
             System.out.println(l);
@@ -466,7 +482,6 @@ public class Kronecker {
 //                }
 //                System.out.println();
 //            }
-
 
 
     }
@@ -507,7 +522,7 @@ class Matrix {
     private String filePath;
     private int rowsCount;
     private int colsCount;
-    private double matrixArray[][];
+    public double matrixArray[][];
     private Scanner scanner;
     private double inverse[][];
 
@@ -518,6 +533,14 @@ class Matrix {
         inverse = new double[n][n];
     }
 
+    public Matrix(double[][] matrArray) {
+        int n = matrArray.length;
+        rowsCount = n;
+        colsCount = n;
+        matrixArray = matrArray;
+        inverse = new double[n][n];
+    }
+
     public Matrix(String filePath) throws FileNotFoundException {
         this.filePath = filePath;
         this.scanner = new Scanner(new File(this.filePath));
@@ -525,7 +548,6 @@ class Matrix {
         this.colsCount = scanner.nextInt();
         this.matrixArray = null;
     }
-
 
     public void getMatrixFromFile() {
         matrixArray = new double[this.rowsCount][this.colsCount];
