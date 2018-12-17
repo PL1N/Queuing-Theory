@@ -328,7 +328,7 @@ public class Kronecker {
         return res;
     }
 
-    public static double calcLambda(){
+    public static double calcLambda() {
         int sum = 0;
         double[][] Smin1 = inversionMatrix(S);
         double[] res = prodVM(b, Smin1);
@@ -355,7 +355,8 @@ public class Kronecker {
         }
         System.out.println("mu = " + mu);
         if (lambda / mu >= 1) {
-            System.out.println("Анин метод");;
+            System.out.println("Анин метод");
+            ;
         }
         return lambda;
     }
@@ -443,20 +444,21 @@ public class Kronecker {
             System.out.println("S.txt:");
             S.printMatrix();
 
-            Kronecker.S = S.getMatrixArray();
-
+            double norm = Matrix.normMatrix(S);
+            System.out.println("norma = " + norm);
 
             Matrix D1 = new Matrix("inputData/D1.txt");
             D1.getMatrixFromFile();
             System.out.println("D1.txt:");
             D1.printMatrix();
 
-            double l = Kronecker.calcLambda();
-            System.out.println(l);
+//            double l = Kronecker.calcLambda();
+            //          System.out.println(l);
 
         } catch (FileNotFoundException e) {
             System.out.println("FileNotFoundException");
         }
+
 
 //            double[][] Matrix = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
 //            double[][] transpose = Kronecker.transposeMatrix(Matrix);
@@ -466,7 +468,6 @@ public class Kronecker {
 //                }
 //                System.out.println();
 //            }
-
 
 
     }
@@ -503,6 +504,7 @@ class GaussMethod {
     }
 }
 
+
 class Matrix {
     private String filePath;
     private int rowsCount;
@@ -510,6 +512,191 @@ class Matrix {
     private double matrixArray[][];
     private Scanner scanner;
     private double inverse[][];
+
+    public Matrix(double[][] matrArray) {
+        int n = matrArray.length;
+        rowsCount = n;
+        colsCount = n;
+        matrixArray = matrArray;
+        inverse = new double[n][n];
+    }
+
+
+    public static double normMatrix(Matrix A) {
+        int N = A.getLength();
+        double norma = 0;
+        double tmp;
+        for (int i = 0; i < N; i++) {
+            tmp = 0;
+            for (int j = 0; j < N; j++) {
+                tmp += Math.abs(A.matrixArray[i][j]);
+            }
+            if (norma <= tmp) norma = tmp;
+        }
+        return norma;
+    }
+
+
+    private static Matrix I(int n) {
+        Matrix I = new Matrix(n);
+        for (int i = 0; i < n; i++) {
+            I.matrixArray[i][i] = 1;
+        }
+        return I;
+    }
+
+
+    public static Matrix matrixMultipleMatrix(Matrix A, Matrix B) {
+        int rows = A.rowsCount;
+        int cols = B.colsCount;
+        int N = A.colsCount;
+        double sum;
+        Matrix result = new Matrix(rows);
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                sum = 0;
+                for (int k = 0; k < N; k++) {
+                    sum += A.matrixArray[i][k] * B.matrixArray[k][j];
+                }
+                result.setMatrixArray(i, j, sum);
+            }
+        }
+        return result;
+    }
+
+    public Matrix multipleMatrixOnValue(double a) {
+        Matrix tmp = new Matrix(this.rowsCount);
+        for (int i = 0; i < this.rowsCount; i++)
+            for (int j = 0; j < this.colsCount; j++) {
+                tmp.setMatrixArray(i, j, this.matrixArray[i][j]);
+            }
+
+        for (int i = 0; i < this.getLength(); i++) {
+            for (int j = 0; j < this.getLength(); j++) {
+                tmp.matrixArray[i][j] = a * tmp.matrixArray[i][j];
+            }
+        }
+        return tmp;
+    }
+
+    public void setMatrixArray(int i, int j, double num) {
+        this.matrixArray[i][j] = num;
+    }
+
+    public void setMatrixInverse(double[][] inverse) {
+        int rows = inverse.length;
+        int cols = inverse[0].length;
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                this.inverse[i][j] = inverse[i][j];
+            }
+        }
+    }
+
+    public void setMatrixArray(double[][] matrixArray) {
+        int rows = matrixArray.length;
+        int cols = matrixArray[0].length;
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                this.matrixArray[i][j] = matrixArray[i][j];
+            }
+        }
+    }
+
+    public static double[][] calculateInverseMatrix(Matrix matrix) {
+        Matrix remember = new Matrix(matrix.getLength());
+        remember.setMatrixArray(matrix.matrixArray);
+        int n = matrix.getLength();
+        Matrix test = new Matrix(matrix.matrixArray);
+        //создаем единичную матрицу для формирования обратной
+        for (int i = 0; i < n; i++) {
+            test.inverse[i][i] = 1;
+        }
+
+        double del;
+
+        for (int i = 0; i < n; i++) {
+            del = test.matrixArray[i][i];
+            //делим строку
+            for (int j = 0; j < n; j++) {
+                test.matrixArray[i][j] /= del;
+                test.inverse[i][j] /= del;
+            }
+
+            double[] str = new double[n];
+            double[] str2 = new double[n];
+            for (int w = 0; w < n; w++) {
+                str[w] = test.matrixArray[i][w];
+                str2[w] = test.inverse[i][w];
+            }
+
+            //зануляем элементы под единицей
+            for (int t = i + 1; t < n; t++) { //выбираем строку для зануления
+                del = test.matrixArray[t][i];
+                double[] change1 = Matrix.multipleVectorValue(str, del);
+                double[] change2 = Matrix.multipleVectorValue(str2, del);
+                for (int k = 0; k < n; k++) { //зануляем элемент и изменяем строку
+                    test.matrixArray[t][k] = test.matrixArray[t][k] - change1[k];
+                    test.inverse[t][k] = test.inverse[t][k] - change2[k];
+                }
+            }
+        }
+
+        /*обратный ход*/
+        double[] str = new double[n];
+
+        for (int i = n - 1; i > 0; i--) {//столбцы
+            for (int w = 0; w < n; w++) {
+                str[w] = test.inverse[i][w];
+            }
+            for (int j = i - 1; j >= 0; j--) {//строки
+                del = test.matrixArray[j][i];
+                test.matrixArray[j][i] = 0;
+                double[] tmp = str;
+                for (int w = 0; w < n; w++) {
+                    tmp[w] = str[w];
+                    test.inverse[j][w] -= del * tmp[w];
+                }
+            }
+        }
+        matrix.setMatrixArray(remember.matrixArray);
+        matrix.setMatrixInverse(test.inverse);
+
+        return test.getMatrixInverse();
+    }
+
+    public double[][] getMatrixInverse() {
+        return this.inverse;
+    }
+
+    private static double[] multipleVectorValue(double[] vector, double value) {
+        double[] tmp = new double[vector.length];
+        for (int j = 0; j < vector.length; j++) {
+            tmp[j] = vector[j];
+        }
+        for (int i = 0; i < tmp.length; i++) {
+            tmp[i] *= value;
+        }
+        return tmp;
+    }
+
+
+    public static Matrix[] getFi(Matrix[][] Q, double epsF) {
+        int N = Q.length;
+        Matrix[] F = new Matrix[N];
+        F[0] = I(2);
+        for (int i = 1; i < N; i++) {
+            while (normMatrix(F[i-1]) > epsF){
+                Matrix multipleFQ = matrixMultipleMatrix(F[i-1], Q[i-1][i]);
+                Matrix tmp2 = Q[i][i].multipleMatrixOnValue(-1);
+                double[][] inverseQ = Matrix.calculateInverseMatrix(tmp2);
+                Matrix inverse = new Matrix(inverseQ);
+                F[i] =  matrixMultipleMatrix(multipleFQ, inverse);
+
+            }
+        }
+        return F;
+    }
 
     public Matrix(int n) {
         rowsCount = n;
@@ -535,14 +722,6 @@ class Matrix {
                 matrixArray[i][j] = scanner.nextDouble();
             }
         }
-    }
-
-    public void setMatrixArray(int i, int j, double num) {
-        this.matrixArray[i][j] = num;
-    }
-
-    public void setMatrixInverse(double[][] inverse) {
-        this.inverse = inverse;
     }
 
     public int getLength() {
