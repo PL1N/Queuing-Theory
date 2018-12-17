@@ -337,8 +337,8 @@ public class Kronecker {
         for (int i = 0; i < res.length; i++) {
             mu += res[i];
         }
-        mu *= (-1);
-        mu /= mu;
+        mu *= (-1.0);
+        mu = 1.0/mu;
         double[][] matrix = sum(D0.getMatrixArray(), D1.getMatrixArray());
         for (int i = 0; i < matrix.length; i++) {
             matrix[i][0] = 1;
