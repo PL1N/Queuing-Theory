@@ -108,8 +108,8 @@ public class Kronecker {
         Q00 = D0;
         Q01 = D1;
         Q10 = new Matrix(kroneckerProductOfMatrixAndVector(createE(W + 1), S0));
-        double[] S0B = product2Vectors(S0, b);
-        Q0 = new Matrix(kroneckerProductOfMatrixAndVector(createE(W + 1), S0B));
+        double[][] S0B = product2VectorsResultmatrix(S0, b);
+        Q0 = new Matrix(kroneckerProduct(createE(W + 1), S0B));
         Q1 = new Matrix(kronekerSum(D0.getMatrixArray(), S.getMatrixArray()));
         Q2 = new Matrix(kroneckerProduct(D1.getMatrixArray(), createE(M)));
     }
@@ -143,6 +143,15 @@ public class Kronecker {
         for (int i = 0; i < a.length; ++i) {
             for (int j = 0; j < b.length; ++j)
                 result[i] = a[i] * b[j];
+        }
+        return result;
+    }
+
+    public static double[][] product2VectorsResultmatrix(double[] a, double[] b) {
+        double[][] result = new double[a.length][b.length];
+        for (int i = 0; i < a.length; ++i) {
+            for (int j = 0; j < b.length; ++j)
+                result[i][j] = a[i] * b[j];
         }
         return result;
     }
@@ -460,7 +469,7 @@ public class Kronecker {
             double norm = Matrix.normMatrix(S);
             System.out.println("norma = " + norm);
 
-            Matrix D1 = new Matrix("inputData/D1.txt");
+            //Matrix D1 = new Matrix("inputData/D1.txt");
             Kronecker.S = S;
 
             Kronecker.D1 = new Matrix("inputData/D1.txt");
@@ -475,6 +484,9 @@ public class Kronecker {
             for (int i = 0; i < Kronecker.b.length; i++) {
                 System.out.print(b[i] + " ");
             }
+
+            Kronecker.infinitesimalGenerator(1,2);
+            print_generator();
 
             //double l = Kronecker.calcLambda();
             //System.out.println(l);
