@@ -16,6 +16,7 @@ public class Kronecker {
     static Matrix Q0;
     static Matrix Q1;
     static Matrix Q2;
+    static double epsF = Math.pow(10, -8);
 
 
     public static double[][] readMatrix(Scanner in) {
@@ -338,7 +339,7 @@ public class Kronecker {
             mu += res[i];
         }
         mu *= (-1.0);
-        mu = 1.0/mu;
+        mu = 1.0 / mu;
         double[][] matrix = sum(D0.getMatrixArray(), D1.getMatrixArray());
         for (int i = 0; i < matrix.length; i++) {
             matrix[i][0] = 1;
@@ -355,12 +356,9 @@ public class Kronecker {
         }
         System.out.println("mu = " + mu);
         if (lambda / mu >= 1) {
-<<<<<<< HEAD
             System.out.println("Анин метод");
             ;
-=======
             System.out.println("Условие не выполняется");
->>>>>>> 031eb8c035921c84d95552c5c1f572dcb6b80eb7
         }
         return lambda;
     }
@@ -459,37 +457,64 @@ public class Kronecker {
             System.out.println("S.txt:");
             S.printMatrix();
 
-<<<<<<< HEAD
             double norm = Matrix.normMatrix(S);
             System.out.println("norma = " + norm);
 
             Matrix D1 = new Matrix("inputData/D1.txt");
-=======
             Kronecker.S = S;
 
             Kronecker.D1 = new Matrix("inputData/D1.txt");
->>>>>>> 031eb8c035921c84d95552c5c1f572dcb6b80eb7
             D1.getMatrixFromFile();
             System.out.println("D1.txt:");
             D1.printMatrix();
 
-<<<<<<< HEAD
 //            double l = Kronecker.calcLambda();
             //          System.out.println(l);
-=======
             Kronecker.b = Kronecker.getVectorFromFile("inputData/b.txt");
             System.out.println("b:");
             for (int i = 0; i < Kronecker.b.length; i++) {
-                System.out.print(b[i]+" ");
+                System.out.print(b[i] + " ");
             }
 
-            double l = Kronecker.calcLambda();
-            System.out.println(l);
->>>>>>> 031eb8c035921c84d95552c5c1f572dcb6b80eb7
+            //double l = Kronecker.calcLambda();
+            //System.out.println(l);
 
         } catch (FileNotFoundException e) {
             System.out.println("FileNotFoundException");
         }
+
+
+        double[][] Q0 = {{0, 0, 0, 0}, {0, 0, 0, 0}, {30, 0, 30, 0}, {0, 0, 0, 0}};
+        double[][] Q1 = {{22, -30, 1, 0}, {0, -38, 0, 1}, {1, 0, 19, -30}, {0, 1, 0, -41}};
+        double[][] Q2 = {{2, 0, 5, 0}, {0, 2, 0, 5}, {4, 0, 6, 0}, {0, 4, 0, 6}};
+        double[][] Q10 = {{-30, 30, 0, 0}, {0, -30, 0, 0}, {0, 0, -30, 30}, {0, 0, 0, -30}};
+        double[][] G0m = {{-0.84164, 1.50869, 0.719406, -1.20394}, {0., 0.789996, 0.,
+                0.0192822}, {0.927345, -1.62638, -0.53449, 0.945648}, {0.,
+                0.0192879, 0., 0.732196}};
+
+        double[][] G4m = {{-8.8004, 0.4271, -9.2571, 0.7681}, {0., 0.0001, 0.,
+                0.0001}, {-15.6387, 0.6764, -16.3621, 1.2166}, {0., 0.0001, 0.,
+                0.0001}};
+
+        Matrix G0 = new Matrix(G0m);
+        Matrix G = new Matrix(G4m);
+        Matrix[][] arrayQ = new Matrix[3][3];
+        arrayQ[0][0] = Kronecker.D0;
+        arrayQ[0][1] = Kronecker.D1;
+        arrayQ[1][0] = new Matrix(Q10);
+        arrayQ[1][1] = new Matrix(Q1);
+        arrayQ[1][2] = new Matrix(Q2);
+        arrayQ[2][1] = new Matrix(Q0);
+        arrayQ[2][2] = new Matrix(Q1);
+
+
+
+         Matrix[] resFi = Matrix.getFi(arrayQ, G0, G);
+         for (int i = 0; i < resFi.length; i++) {
+             System.out.println("F" + i);
+             resFi[i].printMatrix();
+             System.out.println();
+         }
 
 
 //            double[][] Matrix = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
@@ -712,23 +737,61 @@ class Matrix {
         return tmp;
     }
 
+    public static Matrix sumTwoMatrix(Matrix A, Matrix B) {
+        int size1 = A.rowsCount;
+        int size2 = B.colsCount;
+        Matrix sum = new Matrix(size1);
+        for (int i = 0; i < size1; i++) {
+            for (int j = 0; j < size2; j++) {
+                sum.matrixArray[i][j] = A.matrixArray[i][j] + B.matrixArray[i][j];
+            }
+        }
+        return sum;
+    }
 
-    public static Matrix[] getFi(Matrix[][] Q, double epsF) {
+    public static Matrix[] getFi(Matrix[][] Q, Matrix G0, Matrix G) {
         int N = Q.length;
         Matrix[] F = new Matrix[N];
+        Matrix Qshtrihii, Qshtrihij;
         F[0] = I(2);
         for (int i = 1; i < N; i++) {
-            while (normMatrix(F[i-1]) > epsF){
-                Matrix multipleFQ = matrixMultipleMatrix(F[i-1], Q[i-1][i]);
-                Matrix tmp2 = Q[i][i].multipleMatrixOnValue(-1);
+            while (normMatrix(F[i - 1]) > Kronecker.epsF) {
+                if (i == 1) {
+                    Qshtrihii = Matrix.sumTwoMatrix(Kronecker.Q00, Matrix.matrixMultipleMatrix(Kronecker.Q01, G0));
+                    Qshtrihij = Kronecker.Q01;
+                } else {
+                    Qshtrihii = Matrix.sumTwoMatrix(Kronecker.Q1, Matrix.matrixMultipleMatrix(Kronecker.Q2, G));
+                    Qshtrihij = Kronecker.Q2;
+                }
+
+
+                Matrix multipleFQ = matrixMultipleMatrix(F[i - 1], Qshtrihij);
+                Matrix tmp2 = Qshtrihii.multipleMatrixOnValue(-1);
                 double[][] inverseQ = Matrix.calculateInverseMatrix(tmp2);
                 Matrix inverse = new Matrix(inverseQ);
-                F[i] =  matrixMultipleMatrix(multipleFQ, inverse);
+                F[i] = matrixMultipleMatrix(multipleFQ, inverse);
 
             }
         }
         return F;
     }
+
+//    public static Matrix[] getFi(Matrix[][] Q, double epsF) {
+//        int N = Q.length;
+//        Matrix[] F = new Matrix[N];
+//        F[0] = I(2);
+//        for (int i = 1; i < N; i++) {
+//            while (normMatrix(F[i-1]) > epsF){
+//                Matrix multipleFQ = matrixMultipleMatrix(F[i-1], Q[i-1][i]);
+//                Matrix tmp2 = Q[i][i].multipleMatrixOnValue(-1);
+//                double[][] inverseQ = Matrix.calculateInverseMatrix(tmp2);
+//                Matrix inverse = new Matrix(inverseQ);
+//                F[i] =  matrixMultipleMatrix(multipleFQ, inverse);
+//
+//            }
+//        }
+//        return F;
+//    }
 
     public Matrix(int n) {
         rowsCount = n;
@@ -737,13 +800,6 @@ class Matrix {
         inverse = new double[n][n];
     }
 
-    public Matrix(double[][] matrArray) {
-        int n = matrArray.length;
-        rowsCount = n;
-        colsCount = n;
-        matrixArray = matrArray;
-        inverse = new double[n][n];
-    }
 
     public Matrix(String filePath) throws FileNotFoundException {
         this.filePath = filePath;
