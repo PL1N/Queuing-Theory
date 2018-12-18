@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.Scanner;
 
 public class Kronecker {
+    static Matrix G0;
+    static Matrix G;
     static Matrix D0;
     static Matrix D1;
     static Matrix S;
@@ -521,7 +523,7 @@ public class Kronecker {
 
 
 
-         Matrix[] resFi = Matrix.getFi(arrayQ, G0, G);
+         Matrix[] resFi = Matrix.getFi(arrayQ, Kronecker.G);
          for (int i = 0; i < resFi.length; i++) {
              System.out.println("F" + i);
              resFi[i].printMatrix();
@@ -561,6 +563,7 @@ class GaussMethod {
                 }
             }
         }
+
         /*обратный ход*/
         x[n - 1] = f[n - 1];
         for (int i = n - 2; i >= 0; i--) {
@@ -571,7 +574,11 @@ class GaussMethod {
         }
         return x;
     }
+
+
 }
+
+
 
 
 class Matrix {
@@ -761,7 +768,7 @@ class Matrix {
         return sum;
     }
 
-    public static Matrix[] getFi(Matrix[][] Q, Matrix G0, Matrix G) {
+    public static Matrix[] getFi(Matrix[][] Q, Matrix G) {
         int N = Q.length;
         Matrix[] F = new Matrix[N];
         Matrix Qshtrihii, Qshtrihij;
@@ -769,7 +776,7 @@ class Matrix {
         for (int i = 1; i < N; i++) {
             while (normMatrix(F[i - 1]) > Kronecker.epsF) {
                 if (i == 1) {
-                    Qshtrihii = Matrix.sumTwoMatrix(Kronecker.Q00, Matrix.matrixMultipleMatrix(Kronecker.Q01, G0));
+                    Qshtrihii = Matrix.sumTwoMatrix(Kronecker.Q00, Matrix.matrixMultipleMatrix(Kronecker.Q01, Kronecker.G0));
                     Qshtrihij = Kronecker.Q01;
                 } else {
                     Qshtrihii = Matrix.sumTwoMatrix(Kronecker.Q1, Matrix.matrixMultipleMatrix(Kronecker.Q2, G));
