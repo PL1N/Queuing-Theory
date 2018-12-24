@@ -510,8 +510,8 @@ public class Kronecker {
                 0.0001}, {-15.6387, 0.6764, -16.3621, 1.2166}, {0., 0.0001, 0.,
                 0.0001}};
 
-        Matrix G0 = new Matrix(G0m);
-        Matrix G = new Matrix(G4m);
+        Kronecker.G0 = new Matrix(G0m);
+        Kronecker.G = new Matrix(G4m);
         Matrix[][] arrayQ = new Matrix[3][3];
         arrayQ[0][0] = Kronecker.D0;
         arrayQ[0][1] = Kronecker.D1;
@@ -523,7 +523,7 @@ public class Kronecker {
 
 
 
-         Matrix[] resFi = Matrix.getFi(arrayQ, Kronecker.G);
+         Matrix[] resFi = Matrix.getFi(arrayQ);
          for (int i = 0; i < resFi.length; i++) {
              System.out.println("F" + i);
              resFi[i].printMatrix();
@@ -768,7 +768,7 @@ class Matrix {
         return sum;
     }
 
-    public static Matrix[] getFi(Matrix[][] Q, Matrix G) {
+    public static Matrix[] getFi(Matrix[][] Q) {
         int N = Q.length;
         Matrix[] F = new Matrix[N];
         Matrix Qshtrihii, Qshtrihij;
@@ -779,7 +779,7 @@ class Matrix {
                     Qshtrihii = Matrix.sumTwoMatrix(Kronecker.Q00, Matrix.matrixMultipleMatrix(Kronecker.Q01, Kronecker.G0));
                     Qshtrihij = Kronecker.Q01;
                 } else {
-                    Qshtrihii = Matrix.sumTwoMatrix(Kronecker.Q1, Matrix.matrixMultipleMatrix(Kronecker.Q2, G));
+                    Qshtrihii = Matrix.sumTwoMatrix(Kronecker.Q1, Matrix.matrixMultipleMatrix(Kronecker.Q2, Kronecker.G));
                     Qshtrihij = Kronecker.Q2;
                 }
 
